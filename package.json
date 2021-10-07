@@ -1,0 +1,42 @@
+{
+  "name": "socket_cluster",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Socket.io with cluster mode",
+  "main": "main.js",
+  "type": "module",
+  "scripts": {
+    "start": "node main.js",
+    "dev": "nodemon main.js",
+    "lint": "eslint ./"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eokhov/socket.io_cluster.git"
+  },
+  "keywords": [
+    "nodejs",
+    "cluster",
+    "socket.io"
+  ],
+  "author": "Evgeniy Okhov <eokhov@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/eokhov/socket.io_cluster/issues"
+  },
+  "homepage": "https://github.com/eokhov/socket.io_cluster#readme",
+  "devDependencies": {
+    "@babel/core": "^7.15.8",
+    "@babel/eslint-parser": "^7.15.8",
+    "@babel/preset-env": "^7.15.8",
+    "eslint": "^7.32.0",
+    "nodemon": "^2.0.13"
+  },
+  "dependencies": {
+    "@socket.io/cluster-adapter": "^0.1.0",
+    "@socket.io/sticky": "^1.0.1",
+    "dotenv": "^10.0.0",
+    "redis": "^3.1.2",
+    "socket.io": "^4.2.0"
+  }
+}
