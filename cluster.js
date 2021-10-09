@@ -5,12 +5,11 @@ import { setupMaster, setupWorker } from '@socket.io/sticky';
 import { setupPrimary, createAdapter } from '@socket.io/cluster-adapter';
 import io from './worker.js';
 import uidStore from './helpers/uidStore.js';
+import cfg from './helpers/config.js';
 
 const numCPUs = cpus().length;
 
 if(cluster.isPrimary) {
-  console.log(`Master started. Pid: ${process.pid}`);
-
   const httpServer = http.createServer();
   setupMaster(httpServer, {
     loadBalancingMethod: 'least-connection',
@@ -19,8 +18,8 @@ if(cluster.isPrimary) {
   cluster.setupPrimary({
     serialization: 'advanced',
   });
-  httpServer.listen(3000, () => {
-    console.log('Cluster started', process.pid);
+  httpServer.listen(cfg.app_port, () => {
+    console.log(`Cluster started. Pid: ${process.pid}`);
   });
 
   for(let i = 0; i < numCPUs-1; i++) {
@@ -43,11 +42,16 @@ if(cluster.isWorker) {
   
   io.on('connection', async (socket) => {
     console.log('Connect');
-    await uidStore.save(socket.handshake.query.uid, socket.id);
-
-    socket.on('send', async ({uid}) => {
-      let sid = await uidStore.find(uid);
-      io.to(sid).emit('hey', {message: 'echo message'});
-    });
+    try {
+      await uidStore.save(socket.handshake.query.uid, socket.id);
+      
+      socket.on('send', async ({uid}) => {
+        console.log(uid);
+        let sid = await uidStore.find(uid);
+        io.to(sid).emit('hey', {message: 'echo message'});
+      });
+    } catch (error) {
+      console.error(error);
+    }
   });
 }

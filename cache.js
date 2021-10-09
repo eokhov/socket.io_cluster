@@ -1,9 +1,10 @@
 import { promisify } from 'node:util';
+import cfg from './helpers/config.js';
 import redis from 'redis';
 
 const client = redis.createClient({
-  host: 'address',
-  port: 6379
+  host: cfg.cache_host,
+  port: cfg.cache_port,
 });
 
 client.on('error', (e) => {
