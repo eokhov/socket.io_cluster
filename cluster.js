@@ -4,8 +4,9 @@ import { cpus } from 'node:os';
 import { setupMaster, setupWorker } from '@socket.io/sticky';
 import { setupPrimary, createAdapter } from '@socket.io/cluster-adapter';
 import io from './worker.js';
-import uidStore from './helpers/uidStore.js';
 import cfg from './helpers/config.js';
+
+import loginHandler from './handlers/login.js';
 
 const numCPUs = cpus().length;
 
@@ -39,19 +40,10 @@ if(cluster.isPrimary) {
 if(cluster.isWorker) {
   io.adapter(createAdapter());
   setupWorker(io);
+
+  const onConnetion = (socket) => {
+    loginHandler(io, socket);
+  };
   
-  io.on('connection', async (socket) => {
-    console.log('Connect');
-    try {
-      await uidStore.save(socket.handshake.query.uid, socket.id);
-      
-      socket.on('send', async ({uid}) => {
-        console.log(uid);
-        let sid = await uidStore.find(uid);
-        io.to(sid).emit('hey', {message: 'echo message'});
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  });
+  io.on('connection', onConnetion);
 }
